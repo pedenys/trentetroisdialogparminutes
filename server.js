@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+var port = process.env.PORT || 3000;
 
 // allow cross-origin
 app.use(cors());
@@ -19,7 +20,7 @@ app.use('/posts', require('./posts/post.controller'));
 app.use('/podcasts', require('./podcasts/podcast.controller'));
 
 
-app.listen(3000, function () {
-    console.log('App listening on port 3000! Amerika Fuk Yay')
+app.listen(port, function () {
+    console.log('App listening on port ' + port + '! Amerika Fuk Yay')
 })
 
