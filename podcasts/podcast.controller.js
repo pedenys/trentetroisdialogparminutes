@@ -7,7 +7,11 @@ const podcastService = require('./podcast.service')
 router.get('/', getAllPodcasts);
 router.post('/', getPodcastsByTagName)
 
-module.exports = router;
+module.exports = {
+    router,
+    getAllPodcasts,
+    getPodcastsByTagName
+}
 
 function getAllPodcasts(req, res, next) {
     podcastService.getAllPodcasts()
@@ -16,10 +20,15 @@ function getAllPodcasts(req, res, next) {
 }
 
 function getPodcastsByTagName(req, res, next) {
-    const tagName = req.body.tagName
-    podcastService.getPodcastsByTagName(tagName)
-        .then(data => data ? res.send(data) : res.send('No podzzz by tag name magueule'))
+
+    let dataToReturn = podcastService.getPodcastsByTagName(req)
+        .then(data => {
+            data ? dataToReturn = data : dataToReturn = false;
+            return dataToReturn
+        })
         .catch(err => console.log(err))
+    console.log("dataToReturn vaut " + JSON.stringify(dataToReturn))
+    return dataToReturn
 }
 
 

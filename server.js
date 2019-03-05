@@ -13,12 +13,8 @@ app.use(bodyParser.json());
 
 // api routes
 app.post('/', require('./response/response.controller'))
-app.use('/tags', require('./tags/tag.controller'));
-app.use('/posts', require('./posts/post.controller'));
-app.use('/podcasts', require('./podcasts/podcast.controller'));
 
 
 app.listen(port, function () {
     console.log('App listening on port ' + port + '! Amerika Fuk Yay')
 })
-

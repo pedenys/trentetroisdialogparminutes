@@ -9,6 +9,7 @@ const { Card, Suggestion } = require('dialogflow-fulfillment');
 // routes
 router.post('/', dispatchRequest);
 
+
 /**
  * Import from Dialogflow inline editor
  */
@@ -17,8 +18,8 @@ function dispatchRequest(request, response, next) {
     process.env.DEBUG = 'dialogflow:debug'; // enables lib debugging statements
 
     const agent = new WebhookClient({ request, response });
-    console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
-    console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
+    // console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
+    // console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
 
     function welcome(agent) {
         agent.add(`Bienvenue dans l'assitant vocal et virtuel pour 33 bits par minute !`);
@@ -29,9 +30,22 @@ function dispatchRequest(request, response, next) {
         agent.add(`Est-ce que vous pouvez essayer de reformuler ? Je ne suis pas aussi perspicace qu'un humain, hélas…`);
     }
 
-    function handleSquestionPodcastabout(agent) {
+    async function handleSquestionPodcastabout(agent) {
+        const theme = request.body.queryResult.parameters['theme']
 
-        agent.add("J'ai compris que c'était une question à propos du thème d'un podcast")
+        const data = await responseService.handleSquestionPodcastabout(request, response)
+
+        agent.add("Je mouline un petit peu le temps de vérifier s'il y a un podcast sur " + theme)
+        console.log("data")
+        console.log(data)
+        if (data) {
+            titre = data[0].title.rendered
+            agent.add("En effet, il s'agit de l'épisode intitulé " + titre)
+        }
+        else {
+            agent.add("Désolé, je n'ai pas trouvé de podcast sur " + theme)
+            agent.add("Mais l'erreur est humaine comme disait mon père")
+        }
     }
 
     // // Uncomment and edit to make your own intent handler
