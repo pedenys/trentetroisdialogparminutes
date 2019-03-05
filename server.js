@@ -12,9 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // api routes
-app.get('/', function (req, res) {
-    res.send('Hajimemachete señor Machete!')
-})
+app.post('/', require('./response/response.controller'))
 app.use('/tags', require('./tags/tag.controller'));
 app.use('/posts', require('./posts/post.controller'));
 app.use('/podcasts', require('./podcasts/podcast.controller'));
