@@ -14,8 +14,7 @@ module.exports = {
 }
 
 function getAllPodcasts(req, res, next) {
-    podcastService.getAllPodcasts()
-        .then(allPods => allPods ? res.send(allPods) : res.send("No podzzz magueule"))
+    return allPods = podcastService.getAllPodcasts()
         .catch(err => console.log(err))
 }
 

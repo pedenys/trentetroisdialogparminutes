@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const responseService = require('./response.service')
-
+const helper = require('../helpers/helpers')
+const extractNumberFromString = helper.extractNumberFromString
 // Import from Dialogflow inlinde editor
 // const functions = require('firebase-functions');
 const { WebhookClient } = require('dialogflow-fulfillment');
@@ -29,11 +30,35 @@ function dispatchRequest(request, response, next) {
         agent.add(`J'ai pas tout compris. Désolé. Je suis presque plus bête que mon concepteur.`);
         agent.add(`Est-ce que vous pouvez essayer de reformuler ? Je ne suis pas aussi perspicace qu'un humain, hélas…`);
     }
+    // Intent : 33bits.squestion.lastpodcast
+    async function handlePodcastNumber(agent) {
+        const numberPodcast = request.body.queryResult.parameters['numeroepisode']
+        let index;
+        numberPodcast == "dernier" ? index = 0 : index = numberPodcast
+        console.log(index)
+        agent.add("Je vais regarder dans mes papiers…")
 
-    async function handleSquestionPodcastabout(agent) {
+        const data = await responseService.handlePodcastNumber(request, response)
+
+
+        if (data) {
+            titre = data[index - 1].title.rendered
+            const numero = extractNumberFromString(titre)
+            agent.add("En effet, il s'agit de l'épisode " + numero)
+        }
+        else {
+            agent.add("Désolé, je n'ai pas trouvé ce que vous cherchiez")
+        }
+    }
+
+    async function handleWhereToListen(agent) {
+
+    }
+
+    async function handlePodcastAbout(agent) {
         const theme = request.body.queryResult.parameters['theme']
 
-        const data = await responseService.handleSquestionPodcastabout(request, response)
+        const data = await responseService.handlePodcastAbout(request, response)
 
         agent.add("Je mouline un petit peu le temps de vérifier s'il y a un podcast sur " + theme)
         console.log("data")
@@ -81,7 +106,10 @@ function dispatchRequest(request, response, next) {
     let intentMap = new Map();
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
-    intentMap.set('33bits.squestion.podcastabout', handleSquestionPodcastabout);
+    intentMap.set('33bits.hquestion.podcastabout', handlePodcastAbout);
+    intentMap.set('33bits.hquestion.lastpodcast', handlePodcastNumber);
+    intentMap.set('33bits.squestion.wheretolisten', handleWhereToListen);
+    intentMap.set('33bits.squestion.lastpostabout', handleWhereToListen);
     // intentMap.set('your intent name here', googleAssistantHandler);
     agent.handleRequest(intentMap);
 }

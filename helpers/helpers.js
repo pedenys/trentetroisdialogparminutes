@@ -43,7 +43,18 @@ axiosPost = (url, params, header) => {
         .catch(err => console.log(err))
 }
 
+function extractNumberFromString(data) {
+    indexDiese = data.indexOf('#')
+    substr = data.substring(indexDiese)
+    indexSpace = substr.indexOf(' ')
+    numero = substr.substring(1, indexSpace)
+    console.log(`indexDiese vaut ${indexDiese} et indexSpace vaut ${indexSpace}`)
+    console.log(`numero vaut ${numero}`)
+    return numero
+}
+
 module.exports = {
     axiosGet,
-    axiosPost
+    axiosPost,
+    extractNumberFromString
 }

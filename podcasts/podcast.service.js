@@ -10,7 +10,7 @@ module.exports = {
 async function getAllPodcasts() {
     let allPodcasts;
     try {
-        const data = await call.axiosGet(api.apiPodcasts)
+        const data = await call.axiosGet(api.apiPodcasts, { "orderby": "date", "order": "asc" })
         const allPodcasts = data.filter(p => p.status == "publish")
 
         if (allPodcasts) {
