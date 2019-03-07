@@ -32,27 +32,41 @@ function dispatchRequest(request, response, next) {
     }
     // Intent : 33bits.squestion.lastpodcast
     async function handlePodcastNumber(agent) {
-        const numberPodcast = request.body.queryResult.parameters['numeroepisode']
-        let index;
-        numberPodcast == "dernier" ? index = 0 : index = numberPodcast
-        console.log(index)
-        agent.add("Je vais regarder dans mes papiers…")
-
+        // 0. On récupère tous les podcasts
         const data = await responseService.handlePodcastNumber(request, response)
 
+        // 1. On récupère le numéro du podcast demandé par l'utilisateur
+        const numberPodcast = request.body.queryResult.parameters['numeroepisode'] // type : any
 
+        // 2. Si l'utilisateur a dit "dernier" ou "premier"
+        //  - on définit l'index en fonction de cette réponse.
+        // Sinon, on applique des regex pour isoler les chiffres de la requête de l'utilisateur (exemple : "3e" => "3")
+        numberPodcast == "dernier" ? index = data.length - 1 : "premier" || numberPodcasts.includes("1") ? index = 0 : index = Number(numberPodcast.trim().replace(/\D+/g, '')) - 1;
+
+        console.log(`L'index vaut ${index} et numberPodcast vaut ${numberPodcast}`)
+
+
+        // Si on a bien récupéré les podcasts
         if (data) {
-            titre = data[index - 1].title.rendered
+            let newIndex = index;
+            console.log(`l'index depuis if vaut ${JSON.stringify(index)}`)
+            // On cherche le titre
+            titre = data[newIndex].title.rendered
             const numero = extractNumberFromString(titre)
-            agent.add("En effet, il s'agit de l'épisode " + numero)
+
+            console.log("Les tags du podcast sont au nombre de " + data[newIndex].tags.length)
+            let tags = await responseService.handlePodcastTags(data[newIndex].tags)
+
+            const tagsASuppr = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre", "podcast"]
+
+            tags = tags.filter(tag => !tagsASuppr.some(truc => tag.includes(truc)))
+
+            agent.add(`L'épisode ${numero} traite les sujets suivants : ${tags}`)
         }
+        // Sinon, message d'erreur
         else {
             agent.add("Désolé, je n'ai pas trouvé ce que vous cherchiez")
         }
-    }
-
-    async function handleWhereToListen(agent) {
-
     }
 
     async function handlePodcastAbout(agent) {
@@ -69,48 +83,15 @@ function dispatchRequest(request, response, next) {
         }
         else {
             agent.add("Désolé, je n'ai pas trouvé de podcast sur " + theme)
-            agent.add("Mais l'erreur est humaine comme disait mon père")
+            agent.add("Mais l'erreur est humaine comme disait mon géniteur")
         }
     }
 
-    // // Uncomment and edit to make your own intent handler
-    // // uncomment `intentMap.set('your intent name here', yourFunctionHandler);`
-    // // below to get this function to be run when a Dialogflow intent is matched
-    // function yourFunctionHandler(agent) {
-    //   agent.add(`This message is from Dialogflow's Cloud Functions for Firebase editor!`);
-    //   agent.add(new Card({
-    //       title: `Title: this is a card title`,
-    //       imageUrl: 'https://developers.google.com/actions/images/badges/XPM_BADGING_GoogleAssistant_VER.png',
-    //       text: `This is the body text of a card.  You can even use line\n  breaks and emoji! 💁`,
-    //       buttonText: 'This is a button',
-    //       buttonUrl: 'https://assistant.google.com/'
-    //     })
-    //   );
-    //   agent.add(new Suggestion(`Quick Reply`));
-    //   agent.add(new Suggestion(`Suggestion`));
-    //   agent.setContext({ name: 'weather', lifespan: 2, parameters: { city: 'Rome' }});
-    // }
-
-    // // Uncomment and edit to make your own Google Assistant intent handler
-    // // uncomment `intentMap.set('your intent name here', googleAssistantHandler);`
-    // // below to get this function to be run when a Dialogflow intent is matched
-    // function googleAssistantHandler(agent) {
-    //   let conv = agent.conv(); // Get Actions on Google library conv instance
-    //   conv.ask('Hello from the Actions on Google client library!') // Use Actions on Google library
-    //   agent.add(conv); // Add Actions on Google library responses to your agent's response
-    // }
-    // // See https://github.com/dialogflow/dialogflow-fulfillment-nodejs/tree/master/samples/actions-on-google
-    // // for a complete Dialogflow fulfillment library Actions on Google client library v2 integration sample
-
-    // Run the proper function handler based on the matched Dialogflow intent name
     let intentMap = new Map();
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
     intentMap.set('33bits.hquestion.podcastabout', handlePodcastAbout);
     intentMap.set('33bits.hquestion.lastpodcast', handlePodcastNumber);
-    intentMap.set('33bits.squestion.wheretolisten', handleWhereToListen);
-    intentMap.set('33bits.squestion.lastpostabout', handleWhereToListen);
-    // intentMap.set('your intent name here', googleAssistantHandler);
     agent.handleRequest(intentMap);
 }
 

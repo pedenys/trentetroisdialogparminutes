@@ -3,7 +3,8 @@ const call = require('../helpers/helpers')
 
 module.exports = {
     getAllTags,
-    getTagsByName
+    getTagsByName,
+    getTagNameById
 }
 
 async function getAllTags() {
@@ -14,7 +15,6 @@ async function getAllTags() {
             return allTags
         }
         else {
-            console.log("aucun tag")
             return false
         }
     }
@@ -30,3 +30,29 @@ async function getTagsByName(tagName) {
     }
     catch (err) { console.log(err) }
 }
+
+/**
+ * Je boucle sur les ids des tags du podcast pour les comparer à l'ensemble
+ * des tags existants. En cas de concordance, j'ajoute le nom du tag à la
+ * liste des noms de tag à retourner.
+ * @param {*} tagsIds tableau des ids des tags du podcast cherché par
+ * l'utilisateur et dont il faut trouver le nom
+ */
+async function getTagNameById(tagsIds) {
+    try {
+        let tagsName = [];
+
+        const allTags = await getAllTags()
+
+        for (let i = 0; i < tagsIds.length; i++) {
+            allTags.filter(tag => {
+                const isEqual = tag.id == tagsIds[i]
+                isEqual ? tagsName.push(tag.name) : null
+            })
+        }
+        return tagsName
+
+    }
+    catch (err) { console.log(err) }
+}
+
