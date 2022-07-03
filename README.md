@@ -1,3 +1,7 @@
-# 33 dialog par minutes
+# 33 dialog per minutes
 
-C'est un simple projet de test pour DialogFlow, le créateur d'assistant virtuel de Google. Ce repo contient le server à partir duquel les web hooks sont faits.
+This is repo is archived.
+
+## Purpose
+
+POC for Dialogflow, Google's "smart" IA conversational assistant, with webhooks functions deployed to Firebase. 
